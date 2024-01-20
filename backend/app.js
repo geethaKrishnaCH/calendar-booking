@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 
-const routes = require('./routes')
+const routes = require("./routes");
 
 // load .env config
 dotenv.config();
@@ -10,7 +10,7 @@ const app = express();
 
 // middileware to parse json format request body
 app.use(express.json());
-app.use('/api', routes)
+app.use("/api", routes);
 const PORT = process.env.PORT ? process.env.PORT : 3000;
 
 async function connectToDB() {

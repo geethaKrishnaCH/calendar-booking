@@ -1,31 +1,31 @@
-const Category = require('../models/category')
+const Category = require("../models/category");
 
 async function findAllCategories() {
-    return await Category.find();
+  return await Category.find();
 }
 
 async function saveCategory(data) {
-    const category = new Category(data);
-    await category.save();
-    return category;
+  const category = new Category(data);
+  await category.save();
+  return category;
 }
 
 async function updateCategory(category) {
-    return await category.save()
+  return await category.save();
 }
 
 async function findCategoryById(id) {
-    return await Category.findById(id);
+  return await Category.findById(id);
 }
 
 async function findCategoryByName(name) {
-    return await Category.findOne({ name })
+  return await Category.findOne({ name });
 }
 
 module.exports = {
-    findAllCategories,
-    saveCategory,
-    updateCategory,
-    findCategoryById,
-    findCategoryByName
-}
+  findAllCategories,
+  saveCategory,
+  updateCategory,
+  findCategoryById,
+  findCategoryByName,
+};
