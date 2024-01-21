@@ -1,30 +1,25 @@
-const User = require("../models/user");
 const {
   findUserByUsername,
   findUserByEmail,
   saveUser,
   findUserByUsernameOrEmail,
-} = require("../services/user");
+} = require("../dao/user");
+const {
+  validateInputWithSchema,
+} = require("../services/validations/errorHandler");
 const {
   hashPassword,
   validatePassword,
   createJWTToken,
-} = require("../utils/crypt/auth");
+} = require("../services/crypt/auth");
 const {
   userRegistrationReqSchema,
   loginRequestSchema,
-} = require("../utils/validations/user");
+} = require("../services/validations/schemas/user");
 
 async function registerUser(req, res) {
   const data = req.body;
-  const { value, error } = userRegistrationReqSchema.validate(data);
-  if (error) {
-    return res.status(400).json({
-      message: "Invalid request",
-      success: false,
-      data: error,
-    });
-  }
+  const value = validateInputWithSchema(data, userRegistrationReqSchema, res);
 
   const { username, email, password } = value;
   let { roles } = value;
@@ -68,30 +63,21 @@ async function registerUser(req, res) {
   };
   // save the user
   user = await saveUser(user);
-  return res
-    .status(200)
-    .json({
-      data: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        roles: user.roles,
-      },
-      success: true,
-    });
+  return res.json({
+    data: {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      roles: user.roles,
+    },
+    success: true,
+  });
 }
 async function login(req, res) {
   const data = req.body;
 
   // validate loginRequest
-  const { error, value } = loginRequestSchema.validate(data);
-  if (error) {
-    return res.status(400).json({
-      message: "Invalid request",
-      success: false,
-      data: error,
-    });
-  }
+  const value = validateInputWithSchema(data, loginRequestSchema, res);
 
   const { username, password } = value;
 
@@ -120,7 +106,7 @@ async function login(req, res) {
     email: user.email,
     roles: user.roles,
   });
-  return res.status(200).json({
+  return res.json({
     data: jwtRes,
     success: true,
   });

@@ -17,7 +17,7 @@ const bookingSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    trim: true, // Remove leading/trailing whitespace
+    trim: true,
   },
   startTime: {
     type: Date,
@@ -35,28 +35,25 @@ const bookingSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  // Additional optional fields
   subSlots: [
     {
       startTime: Date,
       endTime: Date,
       isBooked: Boolean,
-      user: {
-        // booked user
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    },
-  ],
-  participants: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Booked user (if applicable)
     },
   ],
   maxParticipants: Number,
-  repeatFrequency: String,
-  repeatEndDate: Date,
+  location: {
+    onlineMode: {
+      type: Boolean,
+      default: false,
+    },
+    meetingLink: String,
+    address: String,
+  },
+  // repeatFrequency: String,
+  // repeatEndDate: Date,
   metadata: {}, // Flexible object for custom fields
 });
 
@@ -68,4 +65,4 @@ bookingSchema.virtual("duration").get(function () {
 // Indexes for efficient querying
 bookingSchema.index({ category: 1, startTime: 1, endTime: 1 });
 
-module.exports = mongoose.model("Bookings", bookingSchema);
+module.exports = mongoose.model("Booking", bookingSchema);

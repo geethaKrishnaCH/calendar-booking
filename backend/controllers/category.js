@@ -4,8 +4,11 @@ const {
   findCategoryById,
   findCategoryByName,
   updateCategory,
-} = require("../services/category");
-const { categorySchema } = require("../utils/validations/category");
+} = require("../dao/category");
+const {
+  validateInputWithSchema,
+} = require("../services/validations/errorHandler");
+const { categorySchema } = require("../services/validations/schemas/category");
 
 function transform(category) {
   return {
@@ -18,7 +21,7 @@ function transform(category) {
 async function getAllCategories(req, res) {
   try {
     const categories = await findAllCategories();
-    return res.status(200).json({
+    return res.json({
       data: categories.map((cat) => transform(cat)),
       success: true,
     });
@@ -31,13 +34,8 @@ async function getAllCategories(req, res) {
 }
 async function createCategory(req, res) {
   const data = req.body;
-  const { value, error } = categorySchema.validate(data);
-  if (error) {
-    return res.stutus(400).json({
-      message: "Invalid request",
-      success: false,
-    });
-  }
+  const value = validateInputWithSchema(data, categorySchema, res);
+
   // check if category with the name already exists
   const existingCategory = await findCategoryByName(value.name);
   if (existingCategory) {
@@ -48,7 +46,7 @@ async function createCategory(req, res) {
   }
 
   const category = await saveCategory(value); // value = {name, description}
-  return res.status(200).json({
+  return res.json({
     data: transform(category),
     success: true,
   });
@@ -63,15 +61,7 @@ async function update(req, res) {
     });
   }
 
-  const { value, error } = categorySchema.validate(data);
-
-  if (error) {
-    return res.status(400).json({
-      message: "Invalid request",
-      success: false,
-      data: error,
-    });
-  }
+  const value = validateInputWithSchema(data, categorySchema, res);
 
   // check if category with the id already exists
   const existingCategory = await findCategoryById(id);
@@ -94,7 +84,7 @@ async function update(req, res) {
   category.name = value.name;
   category.description = value.description;
   category = await updateCategory(category);
-  return res.status(200).json({
+  return res.json({
     data: transform(category),
     success: true,
   });
