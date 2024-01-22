@@ -14,7 +14,7 @@ const {
   validateInputWithSchema,
 } = require("../services/validations/errorHandler");
 
-async function createBooking(req, res) {
+async function createBooking(req, res, next) {
   const data = req.body;
 
   // validate booking info
@@ -29,12 +29,10 @@ async function createBooking(req, res) {
       await saveBooking(bookingData);
     } else if (repeatFrequency === "Daily") {
       if (!repeatEndDate) {
-        return res.status(400).json({
-          message: "Please select booking reccurence end time",
-          success: false,
-        });
+        res.status(400);
+        throw new Error("Please select booking reccurence end time");
       }
-      const bookingTimeSlots = createBookingTimesForDateRange(
+      const bookingTimeSlots = createBookingTimeSlotsForDateRange(
         startTime,
         endTime,
         repeatEndDate
@@ -48,12 +46,10 @@ async function createBooking(req, res) {
       await saveBookings(bookingItems);
     } else if (repeatFrequency === "Weekly") {
       if (!repeatEndDate) {
-        return res.status(400).json({
-          message: "Please select booking reccurence end time",
-          success: false,
-        });
+        res.status(400);
+        throw new Error("Please select booking reccurence end time");
       }
-      const bookingTimeSlots = createBookingTimesForDateRangeOnWeeklyBasis(
+      const bookingTimeSlots = createBookingTimeSlotsOnWeeklyBasis(
         startTime,
         endTime,
         repeatedDays,
@@ -72,18 +68,16 @@ async function createBooking(req, res) {
       success: true,
     });
   } catch (err) {
-    return res.status(500).json({
-      message: err.message,
-      success: false,
-    });
+    next(err);
   }
 }
-async function updateBookingDetails(req, res) {
-  const data = req.body;
-
-  // validate booking info
-  validateInputWithSchema(data, updateBookingSchema, res);
+async function updateBookingDetails(req, res, next) {
   try {
+    const data = req.body;
+
+    // validate booking info
+    validateInputWithSchema(data, updateBookingSchema, res);
+
     const startTime = data.startTime;
     const endTime = data.endTime;
 
@@ -95,10 +89,7 @@ async function updateBookingDetails(req, res) {
       success: true,
     });
   } catch (err) {
-    return res.status(500).json({
-      message: err.message,
-      success: false,
-    });
+    next(err);
   }
 }
 async function getAllBookings(req, res) {
@@ -129,15 +120,19 @@ async function getAllBookings(req, res) {
     });
   }
 }
-async function getBookingDetails(req, res) {
-  const { bookingId } = req.params;
-  const booking = await getBookingDetailsById(bookingId);
-  return res.json({
-    data: booking,
-    success: true,
-  });
+async function getBookingDetails(req, res, next) {
+  try {
+    const { bookingId } = req.params;
+    const booking = await getBookingDetailsById(bookingId);
+    return res.json({
+      data: booking,
+      success: true,
+    });
+  } catch (err) {
+    next(err);
+  }
 }
-async function getBookingsByUser(req, res) {
+async function getBookingsByUser(req, res, next) {
   try {
     const { userId } = req.params;
     const { category, bookingDate } = req.query;
@@ -160,10 +155,7 @@ async function getBookingsByUser(req, res) {
       success: true,
     });
   } catch (err) {
-    return res.status(500).json({
-      message: err.message,
-      success: false,
-    });
+    next(err);
   }
 }
 
@@ -220,7 +212,11 @@ function createBookingData(bookingData, startTime, endTime) {
   return bookingData;
 }
 
-function createBookingTimesForDateRange(startTimeStr, endTimeStr, endDateStr) {
+function createBookingTimeSlotsForDateRange(
+  startTimeStr,
+  endTimeStr,
+  endDateStr
+) {
   const timeSlots = [];
 
   const startTime = new Date(startTimeStr);
@@ -244,7 +240,7 @@ function createBookingTimesForDateRange(startTimeStr, endTimeStr, endDateStr) {
   return timeSlots;
 }
 
-function createBookingTimesForDateRangeOnWeeklyBasis(
+function createBookingTimeSlotsOnWeeklyBasis(
   startTimeStr,
   endTimeStr,
   daysOfTheWeek,

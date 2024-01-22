@@ -4,11 +4,12 @@ const {
   createCategory,
   update,
 } = require("../controllers/category");
+const { isAuthenticated } = require("../utils/middleware");
 
 const router = express.Router();
 
 router.get("/", getAllCategories);
-router.post("/", createCategory);
-router.post("/:categoryId", update);
+router.post("/", isAuthenticated, createCategory);
+router.post("/:categoryId", isAuthenticated, update);
 
 module.exports = router;

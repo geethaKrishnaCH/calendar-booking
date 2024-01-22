@@ -6,5 +6,4 @@ module.exports = {
   ROLES,
   DAYS_IN_A_WEEK,
   REPEAT_FREQUENCIES,
-  //   SLOT_DURATIONS,
 };
