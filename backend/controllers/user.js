@@ -10,12 +10,7 @@ const {
   userRegistrationReqSchema,
   loginRequestSchema,
 } = require("../services/validations/schemas/user");
-const {
-  generateTokens,
-  generateAccessToken,
-} = require("../services/crypt/jwt");
-const { v4: uuidv4 } = require("uuid");
-const setRefreshToken = require("../utils/setRefreshToken");
+const { generateAccessToken } = require("../services/crypt/jwt");
 const jwt = require("jsonwebtoken");
 
 async function registerUser(req, res, next) {
@@ -63,9 +58,7 @@ async function registerUser(req, res, next) {
     user = await saveUser(user);
 
     // generate unique uid to prevent replay attacks
-    const jti = uuidv4();
-    const { accessToken, refreshToken } = generateTokens(user, jti);
-    setRefreshToken(res, refreshToken);
+    const accessToken = generateAccessToken(user);
     return res.json({
       data: { accessToken },
       success: true,
@@ -97,55 +90,9 @@ async function login(req, res, next) {
       throw new Error("Incorrect credentials");
     }
 
-    const jti = uuidv4();
-    // generate jwt token
-    const { accessToken, refreshToken } = generateTokens(user, jti);
-    setRefreshToken(res, refreshToken);
+    const accessToken = generateAccessToken(user);
     return res.json({
       data: { accessToken },
-      success: true,
-    });
-  } catch (err) {
-    next(err);
-  }
-}
-
-async function refreshToken(req, res, next) {
-  try {
-    const refreshToken = req.cookies.refresh_token;
-    if (!refreshToken) {
-      res.status(400);
-      throw new Error("Missing refresh token.");
-    }
-
-    const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-
-    const user = await findUserByEmail(payload.email);
-    if (!user) {
-      res.status(401);
-      throw new Error("Unauthorized");
-    }
-
-    const jti = uuidv4();
-    const accessToken = generateAccessToken(user);
-
-    // setRefreshToken(res, newRefreshToken);
-    res.json({
-      data: { accessToken },
-      success: true,
-    });
-  } catch (err) {
-    if (err.name === "TokenExpiredError") {
-      res.status(401);
-    }
-    next(err);
-  }
-}
-
-async function logout(req, res, next) {
-  try {
-    setRefreshToken(res, "");
-    res.json({
       success: true,
     });
   } catch (err) {
@@ -156,6 +103,4 @@ async function logout(req, res, next) {
 module.exports = {
   registerUser,
   login,
-  refreshToken,
-  logout,
 };
