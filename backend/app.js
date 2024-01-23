@@ -9,8 +9,14 @@ const { notFound, errorHandler } = require("./utils/middleware");
 // load .env config
 dotenv.config();
 const app = express();
-
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Specify allowed origins
+    credentials: true, // Allow sending credentials
+    allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
+  })
+);
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api", routes);

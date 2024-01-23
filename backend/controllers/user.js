@@ -4,9 +4,7 @@ const {
   saveUser,
   findUserByUsernameOrEmail,
 } = require("../dao/user");
-const {
-  validateInputWithSchema,
-} = require("../services/validations/errorHandler");
+const { validateInputWithSchema } = require("../utils/errorHandler");
 const { createHash, validatePassword } = require("../services/crypt/hash");
 const {
   userRegistrationReqSchema,
@@ -119,6 +117,7 @@ async function refreshToken(req, res, next) {
       res.status(400);
       throw new Error("Missing refresh token.");
     }
+
     const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
     const user = await findUserByEmail(payload.email);
@@ -136,6 +135,20 @@ async function refreshToken(req, res, next) {
       success: true,
     });
   } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      res.status(401);
+    }
+    next(err);
+  }
+}
+
+async function logout(req, res, next) {
+  try {
+    setRefreshToken(res, "");
+    res.json({
+      success: true,
+    });
+  } catch (err) {
     next(err);
   }
 }
@@ -144,4 +157,5 @@ module.exports = {
   registerUser,
   login,
   refreshToken,
+  logout,
 };

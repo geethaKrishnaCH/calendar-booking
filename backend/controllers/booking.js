@@ -10,9 +10,7 @@ const {
   createBookingSchema,
   updateBookingSchema,
 } = require("../services/validations/schemas/booking");
-const {
-  validateInputWithSchema,
-} = require("../services/validations/errorHandler");
+const { validateInputWithSchema } = require("../utils/errorHandler");
 
 async function createBooking(req, res, next) {
   const data = req.body;
@@ -37,7 +35,6 @@ async function createBooking(req, res, next) {
         endTime,
         repeatEndDate
       );
-      console.log(bookingTimeSlots);
       const bookingItems = bookingTimeSlots.map((booking) =>
         createBookingData(data, booking.startTime, booking.endTime)
       );
@@ -55,7 +52,6 @@ async function createBooking(req, res, next) {
         repeatedDays,
         repeatEndDate
       );
-      console.log(bookingTimeSlots);
       const bookingItems = bookingTimeSlots.map((booking) =>
         createBookingData(data, booking.startTime, booking.endTime)
       );
@@ -234,7 +230,6 @@ function createBookingTimeSlotsForDateRange(
     timeSlots.push({ startTime: dateWithStartTime, endTime: dateWithEndTime });
 
     currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
-    console.log(currentDate <= endDate);
   }
 
   return timeSlots;
