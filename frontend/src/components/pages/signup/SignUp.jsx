@@ -4,13 +4,15 @@ import {
   Card,
   Col,
   Container,
-  FloatingLabel,
   Form,
-  FormGroup,
+  InputGroup,
   Row,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import useAxios from "../../../apis/axios-hook/useAxios";
+import { CiUser } from "react-icons/ci";
+import { MdOutlineEmail } from "react-icons/md";
+import { RiLockPasswordLine } from "react-icons/ri";
+import useUserApi from "../../../apis/useUserAPI";
 import AppContext from "../../context/AppContext";
 
 function SignUp() {
@@ -20,13 +22,12 @@ function SignUp() {
     email: "",
     password: "",
   });
-  const apiClient = useAxios();
-  const { register } = useUserApi(apiClient);
+  const { register } = useUserApi();
   const { setLogInState } = useContext(AppContext);
-  const handleChange = (event) => {
+  const handleChange = (e) => {
     setFormData({
       ...formData,
-      [event.target.name]: event.target.value.trim(),
+      [e.target.name]: e.target.value.trim(),
     });
   };
 
@@ -50,40 +51,48 @@ function SignUp() {
             <Card.Body>
               <h2 className="text-center mb-4">Sign up</h2>
               <Form>
-                <FormGroup controlId="username">
-                  <FloatingLabel controlId="floatingUsername" label="Username">
+                <Form.Group controlId="username">
+                  <InputGroup>
+                    <InputGroup.Text>
+                      <CiUser />
+                    </InputGroup.Text>
                     <Form.Control
                       name="username"
                       type="text"
+                      placeholder="Username"
                       value={formData.username}
                       onChange={handleChange}
                     />
-                  </FloatingLabel>
-                </FormGroup>
-
-                <FormGroup controlId="email" className="mt-3">
-                  <FloatingLabel
-                    controlId="floatingEmail"
-                    label="Email Address"
-                  >
+                  </InputGroup>
+                </Form.Group>
+                <Form.Group controlId="email" className="mt-3">
+                  <InputGroup>
+                    <InputGroup.Text>
+                      <MdOutlineEmail />
+                    </InputGroup.Text>
                     <Form.Control
                       name="email"
                       type="email"
+                      placeholder="Email Address"
                       value={formData.email}
                       onChange={handleChange}
                     />
-                  </FloatingLabel>
-                </FormGroup>
-                <FormGroup controlId="password" className="mt-3">
-                  <FloatingLabel controlId="floatingPassword" label="Password">
+                  </InputGroup>
+                </Form.Group>
+                <Form.Group controlId="password" className="mt-3">
+                  <InputGroup>
+                    <InputGroup.Text>
+                      <RiLockPasswordLine />
+                    </InputGroup.Text>
                     <Form.Control
                       name="password"
                       type="password"
+                      placeholder="Password"
                       value={formData.password}
                       onChange={handleChange}
                     />
-                  </FloatingLabel>
-                </FormGroup>
+                  </InputGroup>
+                </Form.Group>
                 <div className="d-grid gap-2 mt-3">
                   <Button
                     variant="primary"

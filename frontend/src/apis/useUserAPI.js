@@ -1,18 +1,15 @@
-import useAxios from "./axios-hook/useAxios";
-
+import apiClient from "./config/axiosConfi";
 const useUserApi = () => {
-  const apiClient = useAxios();
+  const register = (payload) => apiClient.post("auth/register", payload);
 
-  const register = (payload) => apiClient.post("user/register", payload);
+  const login = (payload) => apiClient.post("auth/login", payload);
 
-  const login = (payload) =>
-    apiClient.request({ method: "POST", url: "user/login" }, payload);
+  const getProfile = () => apiClient.get("user/profile");
 
-  const refreshToken = () => apiClient.get("user/refreshToken");
+  const generateOTP = (payload) => apiClient.post("auth/otp", payload);
+  const verifyOTP = (payload) => apiClient.post("auth/otp/verify", payload);
 
-  const logout = () => apiClient.get("user/logout");
-
-  return { register, login, refreshToken, logout };
+  return { register, login, getProfile, generateOTP, verifyOTP };
 };
 
 export default useUserApi;

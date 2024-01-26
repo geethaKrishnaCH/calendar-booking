@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Button,
   Card,
@@ -6,9 +6,14 @@ import {
   Container,
   Form,
   FormGroup,
+  InputGroup,
   Row,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import useUserApi from "../../../apis/useUserAPI";
+import AppContext from "../../context/AppContext";
+import { RiLockPasswordLine } from "react-icons/ri";
+import { CiUser } from "react-icons/ci";
 
 function Login() {
   const navigate = useNavigate();
@@ -16,11 +21,12 @@ function Login() {
     username: "",
     password: "",
   });
-
-  const handleChange = (event) => {
+  const { login } = useUserApi();
+  const { setLogInState } = useContext(AppContext);
+  const handleChange = (e) => {
     setFormData({
       ...formData,
-      [event.target.name]: event.target.value.trim(),
+      [e.target.name]: e.target.value.trim(),
     });
   };
 
@@ -28,8 +34,9 @@ function Login() {
     navigate("/signup");
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = async () => {
+    const response = (await login(formData)).data;
+    setLogInState(response.data.accessToken);
   };
   const isFormValid = !!formData.username && !!formData.password;
   return (
@@ -40,28 +47,37 @@ function Login() {
             <Card.Body>
               <h2 className="text-center mb-4">Welcome Back!</h2>
               <Form>
-                <FormGroup controlId="username">
-                  <Form.Control
-                    name="username"
-                    type="text"
-                    placeholder="Username"
-                    value={formData.username}
-                    onChange={handleChange}
-                  />
-                </FormGroup>
-                <FormGroup controlId="password" className="mt-3">
-                  <Form.Control
-                    name="password"
-                    type="password"
-                    placeholder="Password"
-                    value={formData.password}
-                    onChange={handleChange}
-                  />
-                </FormGroup>
+                <Form.Group controlId="username">
+                  <InputGroup>
+                    <InputGroup.Text>
+                      <CiUser />
+                    </InputGroup.Text>
+                    <Form.Control
+                      name="username"
+                      type="text"
+                      placeholder="Username"
+                      value={formData.username}
+                      onChange={handleChange}
+                    />
+                  </InputGroup>
+                </Form.Group>
+                <Form.Group controlId="password" className="mt-3">
+                  <InputGroup>
+                    <InputGroup.Text>
+                      <RiLockPasswordLine />
+                    </InputGroup.Text>
+                    <Form.Control
+                      name="password"
+                      type="password"
+                      placeholder="Password"
+                      value={formData.password}
+                      onChange={handleChange}
+                    />
+                  </InputGroup>
+                </Form.Group>
                 <div className="d-grid gap-2 mt-3">
                   <Button
                     variant="primary"
-                    type="submit"
                     onClick={handleSubmit}
                     disabled={!isFormValid}
                   >

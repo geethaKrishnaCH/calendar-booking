@@ -5,7 +5,7 @@ const apiClient = axios.create({
   headers: {
     "Content-type": "application/json",
   },
-  withCredentials: true,
+  //   withCredentials: true,
 });
 
 // request interceptor
@@ -19,23 +19,6 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     // Handle request errors
-    return Promise.reject(error);
-  }
-);
-
-// global error handling
-apiClient.interceptors.response.use(
-  (res) => {
-    return res;
-  },
-  async (error) => {
-    const statusCode = error.response?.status;
-
-    // logging only errors
-    if (statusCode && statusCode > 299) {
-      console.error(error);
-    }
-
     return Promise.reject(error);
   }
 );

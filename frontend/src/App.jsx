@@ -1,16 +1,15 @@
 import React, { useContext, useEffect } from "react";
-import { Col, Container, Row } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import Sidebar from "./components/common/sidebar/Sidebar";
 import styles from "./App.module.css";
-import useAxios from "./apis/axios-hook/useAxios";
+import Navbar from "./components/common/navbar/Navbar";
+import SpinnerLoader from "./components/common/spinner-loader/SpinnerLoader";
 import AppContext from "./components/context/AppContext";
 
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
-  const apiClient = useAxios();
-  const { handleLogout } = useContext(AppContext);
+  const { isLoading } = useContext(AppContext);
   useEffect(() => {
     const pathName = location.pathname;
     if (pathName === "/") {
@@ -20,16 +19,11 @@ function App() {
 
   return (
     <Container fluid className="g-0">
-      <Row className="g-0">
-        <Col xs="1">
-          <Sidebar />
-        </Col>
-        <Col>
-          <div className={styles.content}>
-            <Outlet />
-          </div>
-        </Col>
-      </Row>
+      {isLoading && <SpinnerLoader />}
+      <Navbar />
+      <div className={styles.content}>
+        <Outlet />
+      </div>
     </Container>
   );
 }

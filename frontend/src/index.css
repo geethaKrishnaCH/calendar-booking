@@ -3,3 +3,23 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
+
+.display-7 {
+  font-size: 2rem;
+}
+
+.display-8 {
+  font-size: 1.5rem;
+}
+
+.fs-7 {
+  font-size: 14px;
+}
+
+.fs-8 {
+  font-size: 10px;
+}
+
+.text-gray {
+  color: #525252;
+}

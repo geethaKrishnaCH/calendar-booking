@@ -9,6 +9,9 @@ import Login from "./components/pages/login/Login";
 import SignUp from "./components/pages/signup/SignUp";
 import "./index.css";
 import AuthorizationRoute from "./components/common/auth-route/AuthorizationRoute";
+import ProtectedRoute from "./components/common/protected-route/ProtectedRoute";
+import MyBookings from "./components/pages/bookings/my-bookings/MyBookings";
+import AddBooking from "./components/pages/bookings/add-booking/AddBooking";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +33,22 @@ const router = createBrowserRouter([
           <AuthorizationRoute>
             <Login />
           </AuthorizationRoute>
+        ),
+      },
+      {
+        path: "bookings",
+        element: (
+          <ProtectedRoute>
+            <MyBookings />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "bookings/add",
+        element: (
+          <ProtectedRoute>
+            <AddBooking />
+          </ProtectedRoute>
         ),
       },
     ],
