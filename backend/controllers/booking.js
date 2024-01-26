@@ -179,7 +179,9 @@ async function getUpcomingBookings(req, res, next) {
   try {
     const { startDate, endDate, category } = req.query;
     const startTime = new Date(startDate);
-    const endTime = new Date(endDate).setDate(new Date(endDate).getDate() + 1);
+    const endDateTemp = new Date(endDate);
+    endDateTemp.setDate(endDateTemp.getDate() + 1);
+    const endTime = new Date(endDateTemp);
     const query = {
       startTime: { $gte: startTime },
       endTime: { $lt: endTime },
@@ -197,7 +199,35 @@ async function getUpcomingBookings(req, res, next) {
   }
 }
 
-async function getUpcomingBookingsByUser(req, res, next) {}
+async function getUpcomingBookingsByUser(req, res, next) {
+  try {
+    const user = req.user;
+    const { startDate, endDate, category } = req.query;
+    const startTime = new Date(startDate);
+    const endDateTemp = new Date(endDate);
+    endDateTemp.setDate(endDateTemp.getDate() + 1);
+    const endTime = new Date(endDateTemp);
+
+    if (user.roles.includes("ADMIN")) {
+      const query = {
+        startTime: { $gte: startTime },
+        endTime: { $lt: endTime },
+        user: user.id,
+      };
+
+      if (category) {
+        query.category = category;
+      }
+      const bookings = await findBookingsUsingFilters(query);
+      return res.json({
+        data: bookings,
+        success: true,
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
+}
 
 async function getParticipants(req, res, next) {
   const { bookingId } = req.params;

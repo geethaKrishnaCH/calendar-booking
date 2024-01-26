@@ -7,7 +7,14 @@ async function saveUserBooking(data) {
   return userBooking;
 }
 
-async function findUserBookings(user) {
+async function findUserBookings(user, startDate, endDate, category) {
+  const bookingFilters = {
+    "bookingDetails.startTime": { $gte: startDate },
+    "bookingDetails.endTime": { $lt: endDate },
+  };
+  if (!!category) {
+    bookingFilters["bookingDetails.category"] = category;
+  }
   const pipeline = [
     { $match: { user: new mongoose.Types.ObjectId(user) } },
     {
@@ -18,6 +25,9 @@ async function findUserBookings(user) {
         as: "bookingDetails",
       },
     },
+    {
+      $match: bookingFilters,
+    },
     { $unwind: "$bookingDetails" },
     {
       $project: {
@@ -26,6 +36,7 @@ async function findUserBookings(user) {
         bookingStatus: 1,
         subSlotId: 1,
         bookingDetails: {
+          _id: 1,
           title: 1,
           description: 1,
           startTime: 1,

@@ -27,64 +27,6 @@ async function findBookingDetailsById(id) {
 }
 
 async function findBookingCreator(bookingId) {
-  // const participants = await Booking.aggregate([
-  //   { $match: { _id: new mongoose.Types.ObjectId(bookingId) } },
-  //   {
-  //     $lookup: {
-  //       from: "users",
-  //       localField: "user",
-  //       foreignField: "_id",
-  //       as: "creator",
-  //     },
-  //   },
-  //   { $unwind: "$creator" },
-  //   {
-  //     $lookup: {
-  //       from: "userbookings",
-  //       localField: "_id",
-  //       foreignField: "booking",
-  //       as: "participant",
-  //     },
-  //   },
-  //   { $unwind: "$participant" },
-  //   {
-  //     $lookup: {
-  //       from: "users",
-  //       localField: "participant.user",
-  //       foreignField: "_id",
-  //       as: "participant.userInfo",
-  //     },
-  //   },
-  //   { $unwind: "$participant.userInfo" },
-  //   {
-  //     $group: {
-  //       _id: "$_id",
-  //       eventInfo: { $first: "$$ROOT" },
-  //       participants: { $push: "$participant" }, // Create array of participants
-  //     },
-  //   },
-  //   {
-  //     $project: {
-  //       maxParticipants: "$eventInfo.maxParticipants",
-  //       participants: {
-  //         $map: {
-  //           input: "$participants",
-  //           as: "participant",
-  //           in: {
-  //             userId: "$$participant.userInfo._id",
-  //             username: "$$participant.userInfo.username",
-  //             email: "$$participant.userInfo.email",
-  //           },
-  //         },
-  //       },
-  //       creator: {
-  //         userId: "$eventInfo.creator._id",
-  //         username: "$eventInfo.creator.username",
-  //         email: "$eventInfo.creator.email",
-  //       },
-  //     },
-  //   },
-  // ]);
   const creator = Booking.aggregate([
     { $match: { _id: new mongoose.Types.ObjectId(bookingId) } },
     {

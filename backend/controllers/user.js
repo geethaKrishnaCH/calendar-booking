@@ -48,10 +48,6 @@ async function registerUser(req, res, next) {
       roles = ["USER"];
     }
 
-    if (roles && !roles.includes("USER")) {
-      roles.push("USER");
-    }
-
     // create a new user
     let user = {
       username,
@@ -84,14 +80,14 @@ async function login(req, res, next) {
     // find the user by email or username
     const user = await findUserByUsernameOrEmail(username);
     if (!user) {
-      res.status(403);
+      res.status(400);
       throw new Error("User doesn't exist");
     }
 
     // validate password
     const isValidUser = validatePassword(password, user.password);
     if (!isValidUser) {
-      res.status(403);
+      res.status(400);
       throw new Error("Incorrect credentials");
     }
 
@@ -144,6 +140,7 @@ async function verifyOTP(req, res, next) {
     console.log(otp, transactionId);
     const otpData = await findByTransaction(transactionId);
     if (!otpData) {
+      res.status(400);
       throw new Error("Incorrect OTP");
     }
     if (otpData.otp === otp) {
@@ -169,6 +166,7 @@ async function verifyOTP(req, res, next) {
         success: true,
       });
     } else {
+      res.status(400);
       throw new Error("Incorrect OTP");
     }
   } catch (err) {

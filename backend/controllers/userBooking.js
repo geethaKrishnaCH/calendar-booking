@@ -9,7 +9,6 @@ const {
 async function createUserBooking(req, res, next) {
   const data = req.body;
   const user = req.user;
-  console.log(user);
   try {
     validateInputWithSchema(data, createUserBookingSchema, res);
     const userBookingData = { ...data, user: user.id };
@@ -24,9 +23,19 @@ async function createUserBooking(req, res, next) {
 }
 
 async function getUserBookings(req, res, next) {
-  const user = req.user;
   try {
-    const bookings = await findUserBookings(user.id);
+    const user = req.user;
+    const { startDate, endDate, category } = req.query;
+    const startTime = new Date(startDate);
+    const endDateTemp = new Date(endDate);
+    endDateTemp.setDate(endDateTemp.getDate() + 1);
+    const endTime = new Date(endDateTemp);
+    const bookings = await findUserBookings(
+      user.id,
+      startTime,
+      endTime,
+      category
+    );
     return res.json({
       data: bookings,
       success: true,
