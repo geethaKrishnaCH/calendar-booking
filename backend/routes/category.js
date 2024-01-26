@@ -4,7 +4,7 @@ const {
   createCategory,
   update,
 } = require("../controllers/category");
-const { isAuthenticated } = require("../utils/middleware");
+const { isAuthenticated } = require("../services/middleware");
 
 const router = express.Router();
 

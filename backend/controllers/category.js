@@ -5,7 +5,9 @@ const {
   findCategoryByName,
   updateCategory,
 } = require("../dao/category");
-const { validateInputWithSchema } = require("../utils/errorHandler");
+const {
+  validateInputWithSchema,
+} = require("../services/validations/errorHandler");
 const { categorySchema } = require("../services/validations/schemas/category");
 
 function transform(category) {

@@ -4,7 +4,9 @@ const {
   saveUser,
   findUserByUsernameOrEmail,
 } = require("../dao/user");
-const { validateInputWithSchema } = require("../utils/errorHandler");
+const {
+  validateInputWithSchema,
+} = require("../services/validations/errorHandler");
 const { createHash, validatePassword } = require("../services/crypt/hash");
 const {
   userRegistrationReqSchema,
@@ -12,6 +14,9 @@ const {
 } = require("../services/validations/schemas/user");
 const { generateAccessToken } = require("../services/crypt/jwt");
 const jwt = require("jsonwebtoken");
+const { generateOTP, generateTransactionId } = require("../services/crypt/otp");
+const { saveOTP, findByTransaction } = require("../dao/otp");
+const { createOTPEmail, transporter } = require("../services/email/emailUtil");
 
 async function registerUser(req, res, next) {
   try {
@@ -100,7 +105,81 @@ async function login(req, res, next) {
   }
 }
 
+async function getProfile(req, res, next) {
+  try {
+    const user = req.user;
+    return res.json({
+      data: user,
+      success: true,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function getOTP(req, res, next) {
+  try {
+    const { email } = req.body;
+    const otp = generateOTP();
+    const transactionId = generateTransactionId();
+    const otpData = { otp, transactionId, email };
+    await saveOTP(otpData);
+    await transporter.sendMail(
+      createOTPEmail(email, "OTP for verfication", otp)
+    );
+    return res.json({
+      data: {
+        transactionId,
+      },
+      success: true,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function verifyOTP(req, res, next) {
+  try {
+    const { otp, transactionId } = req.body;
+    console.log(otp, transactionId);
+    const otpData = await findByTransaction(transactionId);
+    if (!otpData) {
+      throw new Error("Incorrect OTP");
+    }
+    if (otpData.otp === otp) {
+      console.log(otpData);
+      let data;
+      const existingUser = await findUserByEmail(otpData.email);
+      console.log(existingUser);
+      if (existingUser) {
+        const accessToken = generateAccessToken(existingUser);
+        data = { accessToken };
+      } else {
+        const userData = {
+          email: otpData.email,
+          roles: ["GUEST"],
+        };
+        const user = await saveUser(userData);
+        console.log(user);
+        const accessToken = generateAccessToken(user);
+        data = { accessToken };
+      }
+      res.json({
+        data,
+        success: true,
+      });
+    } else {
+      throw new Error("Incorrect OTP");
+    }
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   registerUser,
   login,
+  getProfile,
+  getOTP,
+  verifyOTP,
 };

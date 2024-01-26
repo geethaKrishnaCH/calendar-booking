@@ -52,14 +52,14 @@ const bookingSchema = new mongoose.Schema({
     meetingLink: String,
     address: String,
   },
-  // repeatFrequency: String,
-  // repeatEndDate: Date,
-  metadata: {}, // Flexible object for custom fields
 });
 
 // Virtual field for duration
 bookingSchema.virtual("duration").get(function () {
-  return this.endTime.diff(this.startTime);
+  const endTime = new Date(this.endTime);
+  const startTime = new Date(this.startTime);
+  const diffInMillis = endTime.getTime() - startTime.getTime();
+  return `${diffInMillis / (1000 * 60)} min`;
 });
 
 // Indexes for efficient querying

@@ -4,14 +4,15 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const routes = require("./routes");
-const { notFound, errorHandler } = require("./utils/middleware");
+const { notFound, errorHandler } = require("./services/middleware");
+const { transporter } = require("./services/email/emailUtil");
 
 // load .env config
 dotenv.config();
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173", // Specify allowed origins
+    origin: "*", // Specify allowed origins
     credentials: true, // Allow sending credentials
     allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
     methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
@@ -35,6 +36,13 @@ async function main() {
   try {
     await connectToDB();
     console.log("Connected to database");
+    transporter.verify((error, success) => {
+      if (error) {
+        console.error(error);
+      } else {
+        console.log("Email server connection successful!");
+      }
+    });
     app.listen(PORT, () => {
       console.log(`Server started at http://localhost:${PORT}`);
     });

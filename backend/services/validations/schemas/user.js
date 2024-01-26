@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { ROLES } = require("../../../utils/constants");
+const { ROLES } = require("../../../constants");
 
 const userRegistrationReqSchema = Joi.object({
   username: Joi.string().alphanum().min(3).required(),

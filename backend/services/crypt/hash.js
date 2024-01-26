@@ -1,5 +1,4 @@
 const { createHmac } = require("crypto");
-const jwt = require("jsonwebtoken");
 
 function createHash(text) {
   return createHmac("sha256", process.env.SECRET_KEY)

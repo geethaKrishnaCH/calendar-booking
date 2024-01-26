@@ -10,8 +10,10 @@ const userBookingSchema = new mongoose.Schema({
   bookedAt: { type: Date, default: Date.now },
   bookingStatus: {
     type: String,
-    enum: ["PENDING", "CONFIRMED", "CANCELLED"],
-    default: "PENDING",
+    enum: ["CONFIRMED", "CANCELLED"],
+    default: "CONFIRMED",
   },
   subSlotId: { type: mongoose.Schema.Types.ObjectId, ref: "Booking.subSlots" },
 });
+
+module.exports = mongoose.model("UserBooking", userBookingSchema);

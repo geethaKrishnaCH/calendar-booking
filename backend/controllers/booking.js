@@ -2,22 +2,30 @@ const {
   saveBooking,
   saveBookings,
   updateBooking,
-  getBookingsUsingFilters,
-  getBookingDetailsById,
+  findBookingsUsingFilters,
+  findBookingDetailsById,
+  findBookingCreator,
 } = require("../dao/booking");
-const { DAYS_IN_A_WEEK } = require("../utils/constants");
+const { DAYS_IN_A_WEEK } = require("../constants");
 const {
   createBookingSchema,
   updateBookingSchema,
 } = require("../services/validations/schemas/booking");
-const { validateInputWithSchema } = require("../utils/errorHandler");
+const {
+  validateInputWithSchema,
+} = require("../services/validations/errorHandler");
+const { findUserById, findUsersById } = require("../dao/user");
+const { findCategoryById } = require("../dao/category");
+const { findBookedUsers } = require("../dao/userBooking");
 
 async function createBooking(req, res, next) {
   const data = req.body;
+  const user = req.user;
 
-  // validate booking info
-  validateInputWithSchema(data, createBookingSchema, res);
   try {
+    // validate booking info
+    validateInputWithSchema(data, createBookingSchema, res);
+    data.user = user.id;
     const startTime = data.startTime;
     const endTime = data.endTime;
     const { repeatFrequency, repeatedDays, repeatEndDate } = data;
@@ -104,7 +112,7 @@ async function getAllBookings(req, res) {
       query.endTime = { $lt: endDate };
     }
 
-    const bookings = await getBookingsUsingFilters(query);
+    const bookings = await findBookingsUsingFilters(query);
     return res.json({
       data: bookings,
       success: true,
@@ -119,9 +127,21 @@ async function getAllBookings(req, res) {
 async function getBookingDetails(req, res, next) {
   try {
     const { bookingId } = req.params;
-    const booking = await getBookingDetailsById(bookingId);
+    const booking = await findBookingDetailsById(bookingId);
+    if (!booking) {
+      throw new Error("Booking is not available");
+    }
+    const userId = booking.user;
+    const user = await findUserById(userId);
+    const categoryId = booking.category;
+    const category = await findCategoryById(categoryId);
     return res.json({
-      data: booking,
+      data: {
+        ...booking._doc,
+        duration: booking.duration,
+        user: user,
+        category: category.name,
+      },
       success: true,
     });
   } catch (err) {
@@ -145,9 +165,62 @@ async function getBookingsByUser(req, res, next) {
       query.endTime = { $lt: endDate };
     }
 
-    const bookings = await getBookingsUsingFilters(query);
+    const bookings = await findBookingsUsingFilters(query);
     return res.json({
       data: bookings,
+      success: true,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function getUpcomingBookings(req, res, next) {
+  try {
+    const { startDate, endDate, category } = req.query;
+    const startTime = new Date(startDate);
+    const endTime = new Date(endDate).setDate(new Date(endDate).getDate() + 1);
+    const query = {
+      startTime: { $gte: startTime },
+      endTime: { $lt: endTime },
+    };
+    if (category) {
+      query.category = category;
+    }
+    const bookings = await findBookingsUsingFilters(query);
+    return res.json({
+      data: bookings,
+      success: true,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function getUpcomingBookingsByUser(req, res, next) {}
+
+async function getParticipants(req, res, next) {
+  const { bookingId } = req.params;
+  try {
+    if (!bookingId) {
+      res.status(400);
+      throw new Error("Invalid bookingID");
+    }
+    const creatorArr = await findBookingCreator(bookingId);
+    if (creatorArr.length === 0) {
+      res.status(400);
+      throw new Error("Invalid bookingID");
+    }
+    const creator = creatorArr[0];
+    const bookedUsers = await findBookedUsers(bookingId);
+    const userIds = bookedUsers.map((p) => p.user);
+    const participants = await findUsersById(userIds);
+
+    return res.json({
+      data: {
+        creator,
+        participants,
+      },
       success: true,
     });
   } catch (err) {
@@ -200,7 +273,6 @@ function createBookingData(bookingData, startTime, endTime) {
     endTime: endTime,
     maxParticipants: bookingData.maxParticipants,
     location: bookingData.location,
-    metadata: bookingData.metadata,
   };
   if (subSlots && subSlots.length > 0) {
     bookingData.subSlots = subSlots;
@@ -271,6 +343,9 @@ module.exports = {
   createBooking,
   getBookingDetails,
   updateBookingDetails,
+  getUpcomingBookings,
   getAllBookings,
   getBookingsByUser,
+  getUpcomingBookingsByUser,
+  getParticipants,
 };

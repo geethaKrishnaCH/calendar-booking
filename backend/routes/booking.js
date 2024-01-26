@@ -4,15 +4,17 @@ const {
   getBookingDetails,
   updateBookingDetails,
   getAllBookings,
-  getBookingsByUser,
+  getUpcomingBookings,
+  getParticipants,
 } = require("../controllers/booking");
-const { isAuthenticated } = require("../utils/middleware");
+const { isAuthenticated } = require("../services/middleware");
 const router = express.Router();
 
-router.post("/", isAuthenticated, createBooking);
+router.post("/add", isAuthenticated, createBooking);
 router.put("/", isAuthenticated, updateBookingDetails);
 router.get("/", getAllBookings);
+router.get("/upcoming", getUpcomingBookings);
 router.get("/:bookingId", getBookingDetails);
-router.get("/user/:userId", isAuthenticated, getBookingsByUser);
+router.get("/:bookingId/participants", getParticipants);
 
 module.exports = router;

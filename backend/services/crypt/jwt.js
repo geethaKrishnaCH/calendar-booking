@@ -4,7 +4,7 @@ function generateAccessToken(user) {
   return jwt.sign(
     {
       id: user.id,
-      username: user.username,
+      username: user?.username,
       email: user.email,
       roles: user.roles,
     },
