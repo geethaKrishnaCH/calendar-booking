@@ -4,14 +4,15 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import App from "./App";
 import { AppContextProvider } from "./components/context/AppContext";
+import AuthorizationRoute from "./components/guards/auth-route/AuthorizationRoute";
+import ProtectedRoute from "./components/guards/protected-route/ProtectedRoute";
+import AddBooking from "./components/pages/bookings/add-booking/AddBooking";
+import MyBookings from "./components/pages/bookings/my-bookings/MyBookings";
 import Home from "./components/pages/home/Home";
 import Login from "./components/pages/login/Login";
 import SignUp from "./components/pages/signup/SignUp";
 import "./index.css";
-import AuthorizationRoute from "./components/common/auth-route/AuthorizationRoute";
-import ProtectedRoute from "./components/common/protected-route/ProtectedRoute";
-import MyBookings from "./components/pages/bookings/my-bookings/MyBookings";
-import AddBooking from "./components/pages/bookings/add-booking/AddBooking";
+import UserBookings from "./components/pages/bookings/user-bookings/UserBookings";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <MyBookings />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "user/bookings",
+        element: (
+          <ProtectedRoute>
+            <UserBookings />
           </ProtectedRoute>
         ),
       },

@@ -1,0 +1,24 @@
+.toast-container {
+  position: absolute;
+  left: 40%;
+  bottom: 5px;
+  z-index: 1150;
+}
+
+@media (max-width: 768px) {
+  .toast-container {
+    left: 35%;
+  }
+}
+
+@media (max-width: 480px) {
+  .toast-container {
+    left: 5%;
+  }
+}
+
+@media (max-width: 360px) {
+  .toast-container {
+    left: 5px;
+  }
+}

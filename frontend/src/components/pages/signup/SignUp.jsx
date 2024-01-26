@@ -22,8 +22,15 @@ function SignUp() {
     email: "",
     password: "",
   });
+  const [isAdmin, setAdmin] = useState(false);
   const { register } = useUserApi();
-  const { setLogInState } = useContext(AppContext);
+  const {
+    setLogInState,
+    handleAPIError,
+    showLoader,
+    hideLoader,
+    handleShowToast,
+  } = useContext(AppContext);
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -32,9 +39,20 @@ function SignUp() {
   };
 
   const handleSubmit = async () => {
-    // const response = await apiClient.post("user/register", formData);
-    const response = (await register(formData)).data;
-    setLogInState(response.data.accessToken);
+    try {
+      const payload = { ...formData };
+      if (isAdmin) {
+        payload.roles = ["ADMIN"];
+      }
+      showLoader();
+      const { data } = (await register(payload)).data;
+      setLogInState(data.accessToken);
+      handleShowToast("Successfully registered.");
+    } catch (err) {
+      handleAPIError(err);
+    } finally {
+      hideLoader();
+    }
   };
 
   const navigateToSignIn = () => {
@@ -90,6 +108,16 @@ function SignUp() {
                       placeholder="Password"
                       value={formData.password}
                       onChange={handleChange}
+                    />
+                  </InputGroup>
+                </Form.Group>
+                <Form.Group controlId="isAdmin" className="mt-3">
+                  <InputGroup>
+                    <InputGroup.Text>Register as Admin?</InputGroup.Text>
+                    <InputGroup.Checkbox
+                      name="isAdmin"
+                      checked={isAdmin}
+                      onChange={(e) => setAdmin(e.target.checked)}
                     />
                   </InputGroup>
                 </Form.Group>

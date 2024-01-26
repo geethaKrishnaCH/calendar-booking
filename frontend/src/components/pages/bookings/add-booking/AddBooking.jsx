@@ -15,7 +15,8 @@ import AppContext from "../../../context/AppContext";
 
 function AddBooking() {
   const { addBooking } = useBookingsApi();
-  const { showLoader, hideLoader } = useContext(AppContext);
+  const { showLoader, hideLoader, handleAPIError, handleShowToast } =
+    useContext(AppContext);
   const [validated, setValidated] = useState(false);
   const [showReccurenceEndDate, setShowReccurenceEndDate] = useState(false);
   const [showDaysToChoose, setShowDaysToChoose] = useState(false);
@@ -148,7 +149,9 @@ function AddBooking() {
         cleanBookingData();
         showLoader();
         await addBooking(bookingData);
+        handleShowToast("Booking created.");
       } catch (err) {
+        handleAPIError(err);
       } finally {
         hideLoader();
       }

@@ -1,4 +1,4 @@
-import apiClient from "./config/axiosConfi";
+import apiClient from "./config/axiosConfig";
 const useCategoryApi = () => {
   const getCategories = () => apiClient.get("category");
 

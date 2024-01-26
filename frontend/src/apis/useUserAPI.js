@@ -1,4 +1,4 @@
-import apiClient from "./config/axiosConfi";
+import apiClient from "./config/axiosConfig";
 const useUserApi = () => {
   const register = (payload) => apiClient.post("auth/register", payload);
 

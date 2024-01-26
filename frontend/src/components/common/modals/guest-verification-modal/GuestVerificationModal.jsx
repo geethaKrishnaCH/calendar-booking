@@ -14,7 +14,13 @@ export default function GuestVerificationModal({ show, handleClose }) {
   const [transactionId, setTransactionId] = useState(null);
   const navigate = useNavigate();
   const { generateOTP, verifyOTP } = useUserApi();
-  const { setLogInState, showLoader, hideLoader } = useContext(AppContext);
+  const {
+    setLogInState,
+    showLoader,
+    hideLoader,
+    handleAPIError,
+    handleShowToast,
+  } = useContext(AppContext);
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -31,7 +37,9 @@ export default function GuestVerificationModal({ show, handleClose }) {
       showLoader();
       const { data } = (await generateOTP({ email: formData.email })).data;
       setTransactionId(data.transactionId);
-    } catch {
+      handleShowToast("OTP sent.");
+    } catch (err) {
+      handleAPIError(err);
     } finally {
       hideLoader();
     }
@@ -40,16 +48,13 @@ export default function GuestVerificationModal({ show, handleClose }) {
   const handleVerifyOTP = async () => {
     try {
       showLoader();
-      const { data, success } = (
-        await verifyOTP({ otp: formData.otp, transactionId })
-      ).data;
-      if (success) {
-        setLogInState(data.accessToken);
-        handleClose(true);
-      } else {
-        handleClose(false);
-      }
+      const { data } = (await verifyOTP({ otp: formData.otp, transactionId }))
+        .data;
+      setLogInState(data.accessToken);
+      handleClose(true);
+      handleShowToast("OTP Verfied.");
     } catch (err) {
+      handleAPIError(err);
       handleClose(false);
     } finally {
       hideLoader();

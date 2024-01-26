@@ -30,18 +30,32 @@ export default function Navbar() {
           <Nav>
             {isLoggedIn && (
               <>
-                <Nav.Link as={Link} to={"/bookings"}>
-                  <div className="d-flex align-items-center">
-                    <MdEventAvailable size={24} className="me-2" />
-                    <p className="m-0">My Bookings</p>
-                  </div>
-                </Nav.Link>
-                <Nav.Link as={Link} to={"/bookings/add"}>
-                  <div className="d-flex align-items-center">
-                    <FaCalendarPlus size={18} className="me-2" />
-                    <p className="m-0">Add</p>
-                  </div>
-                </Nav.Link>
+                {(user?.roles?.includes("USER") ||
+                  user?.roles?.includes("GUEST")) && (
+                  <Nav.Link as={Link} to={"/user/bookings"}>
+                    <div className="d-flex align-items-center">
+                      <MdEventAvailable size={24} className="me-2" />
+                      <p className="m-0">My Bookings</p>
+                    </div>
+                  </Nav.Link>
+                )}
+
+                {user?.roles?.includes("ADMIN") && (
+                  <>
+                    <Nav.Link as={Link} to={"/bookings"}>
+                      <div className="d-flex align-items-center">
+                        <MdEventAvailable size={24} className="me-2" />
+                        <p className="m-0">My Bookings</p>
+                      </div>
+                    </Nav.Link>
+                    <Nav.Link as={Link} to={"/bookings/add"}>
+                      <div className="d-flex align-items-center">
+                        <FaCalendarPlus size={18} className="me-2" />
+                        <p className="m-0">Add</p>
+                      </div>
+                    </Nav.Link>
+                  </>
+                )}
               </>
             )}
           </Nav>

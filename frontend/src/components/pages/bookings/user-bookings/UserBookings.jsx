@@ -1,37 +1,38 @@
 import { useContext, useEffect, useState } from "react";
-import { Col, Container, Row } from "react-bootstrap";
 import useBookingsApi from "../../../../apis/useBookingsApi";
-import BookingCard from "../../../common/booking-card/BookingCard";
-import FilterOptions from "../../../common/filter-options/FiltersOptions";
 import AppContext from "../../../context/AppContext";
+import FilterOptions from "../../../common/filter-options/FiltersOptions";
+import { Col, Container, Row } from "react-bootstrap";
+import BookingCard from "../../../common/booking-card/BookingCard";
 
-export default function UpcomingBookings() {
+export default function UserBookings() {
   const [bookings, setBookings] = useState([]);
-  const { getUpcomingBookings } = useBookingsApi();
+  const { getBookingBookedByUser } = useBookingsApi();
   const [filters, setFilters] = useState(null);
   const { showLoader, hideLoader, handleAPIError, handleShowToast } =
     useContext(AppContext);
 
   useEffect(() => {
-    async function fetchUpcomingBookings() {
+    async function fetchMyUpcomingBookings() {
       try {
         showLoader();
         const { data } = (
-          await getUpcomingBookings(
+          await getBookingBookedByUser(
             filters.startDate,
             filters.endDate,
             filters.category
           )
         ).data;
-        setBookings(data);
+        setBookings(data.map((item) => item.bookingDetails));
       } catch (err) {
         handleAPIError(err);
+        handleShowToast("Unknown error!", true);
       } finally {
         hideLoader();
       }
     }
     if (filters) {
-      fetchUpcomingBookings();
+      fetchMyUpcomingBookings();
     }
   }, [filters]);
 
@@ -43,7 +44,7 @@ export default function UpcomingBookings() {
     <>
       <FilterOptions onApply={handleApplyFilters} />
       <div className="px-5">
-        <h4 className="py-3 m-0">Upcoming Bookings</h4>
+        <h4 className="py-3 m-0">My Bookings</h4>
         {!bookingsPresent && (
           <h1 className="display-6">No Upcoming Bookings</h1>
         )}

@@ -37,7 +37,6 @@ const FilterOptions = ({ onApply }) => {
   };
 
   const handleCategoryChange = (e) => {
-    console.log(e.target.value);
     setCategory(e.target.value);
   };
 
@@ -54,9 +53,9 @@ const FilterOptions = ({ onApply }) => {
   const today = convertDateToString(new Date());
   const isFormValid = checkFormValid();
   return (
-    <Container fluid className="px-5 py-2 shadow-sm">
+    <Container fluid className="px-sm-5 px-md-3 py-2 shadow-sm">
       <Form as={Row} className="d-flex justify-content-center">
-        <Form.Group as={Col} md="4" className="mb-2">
+        <Form.Group as={Col} md="6" className="mb-2">
           <Form.Label>Date Range</Form.Label>
           <InputGroup>
             <Form.Control
@@ -74,7 +73,7 @@ const FilterOptions = ({ onApply }) => {
             />
           </InputGroup>
         </Form.Group>
-        <Form.Group as={Col} md="2" className="mb-2">
+        <Form.Group as={Col} md="3" className="mb-2">
           <Form.Label>Category</Form.Label>
           <Form.Select value={category} onChange={handleCategoryChange}>
             <option value="">All Categories</option>

@@ -10,26 +10,67 @@ const AppContext = createContext({
   categories: [],
   hideLoader: () => {},
   showLoader: () => {},
+  handleAPIError: () => {},
+  toast: null,
+  handleShowToast: (message, error) => {},
+  handleHideToast: () => {},
 });
 
 export const AppContextProvider = ({ children }) => {
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const [loaderCount, setLoaderCount] = useState(0);
+  const [toast, setToast] = useState({
+    showToast: false,
+    message: "",
+    error: false,
+  });
   const [user, setUser] = useState(null);
   const [categories, setCategories] = useState([]);
   const { getProfile } = useUserApi();
   const { getCategories } = useCategoryApi();
 
-  let loaderCount_ = 0;
+  let loaderCount = 0;
   const showLoader = () => {
     if (!isLoading) setLoading(true);
-    loaderCount_ = loaderCount_ + 1;
+    loaderCount = loaderCount + 1;
   };
 
   const hideLoader = () => {
-    loaderCount_ = loaderCount_ - 1;
-    if (loaderCount_ === 0) setLoading(false);
+    loaderCount = loaderCount - 1;
+    if (loaderCount === 0) setLoading(false);
+  };
+
+  const handleAPIError = (err) => {
+    if (err?.response.status === 401) {
+      handleLogout();
+      handleShowToast("Session has timed out!", true);
+    }
+    if (err?.response.status === 403) {
+      handleShowToast("Access denied!", true);
+    }
+    if (err?.response.status === 400) {
+      handleShowToast(err.response?.data?.message, true);
+    }
+  };
+
+  const handleShowToast = (message, error = false) => {
+    setToast({
+      showToast: true,
+      message,
+      error,
+    });
+    setTimeout(() => {
+      handleHideToast();
+    }, 3000);
+  };
+  const handleHideToast = () => {
+    if (toast.showToast) {
+      setToast({
+        showToast: false,
+        message: "",
+        error: false,
+      });
+    }
   };
 
   const handleLogout = () => {
@@ -62,6 +103,7 @@ export const AppContextProvider = ({ children }) => {
         const { data } = (await getCategories()).data;
         setCategories(data);
       } catch (err) {
+        handleAPIError(err);
       } finally {
         hideLoader();
       }
@@ -77,9 +119,7 @@ export const AppContextProvider = ({ children }) => {
         setUser(response.data);
         localStorage.setItem("user", JSON.stringify(response.data));
       } catch (err) {
-        if (err?.response.status === 401) {
-          handleLogout();
-        }
+        handleAPIError(err);
       } finally {
         hideLoader();
       }
@@ -99,6 +139,10 @@ export const AppContextProvider = ({ children }) => {
         hideLoader,
         showLoader,
         isLoading,
+        handleAPIError,
+        toast,
+        handleShowToast,
+        handleHideToast,
       }}
     >
       {children}
