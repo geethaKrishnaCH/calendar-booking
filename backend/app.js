@@ -27,9 +27,6 @@ app.use(errorHandler);
 const PORT = process.env.PORT ? process.env.PORT : 3000;
 
 async function connectToDB() {
-  // await mongoose.connect(
-  //   `mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_HOST}:27017/bookingDB?authSource=admin`
-  // );
   await mongoose.connect(process.env.MONGO_URL);
 }
 

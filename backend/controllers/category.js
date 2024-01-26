@@ -53,16 +53,10 @@ async function createCategory(req, res, next) {
 async function update(req, res, next) {
   try {
     const data = req.body;
-    const id = req.params.categoryId;
-    if (!id) {
-      res.status(400);
-      throw new Error("Category already exists!");
-    }
-
     const value = validateInputWithSchema(data, categorySchema, res);
 
     // check if category with the id already exists
-    const existingCategory = await findCategoryById(id);
+    const existingCategory = await findCategoryById(data.id);
     if (!existingCategory) {
       res.status(400);
       throw new Error("Category with given id doesn't exist!");

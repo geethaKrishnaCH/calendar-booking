@@ -9,7 +9,7 @@ const { isAuthenticated } = require("../services/middleware");
 const router = express.Router();
 
 router.get("/", getAllCategories);
-router.post("/", isAuthenticated, createCategory);
-router.post("/:categoryId", isAuthenticated, update);
+router.post("/add", isAuthenticated, createCategory);
+router.post("/update", isAuthenticated, update);
 
 module.exports = router;
