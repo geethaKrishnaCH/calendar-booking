@@ -5,10 +5,10 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const routes = require("./routes");
 const { notFound, errorHandler } = require("./services/middleware");
-const { transporter } = require("./services/email/emailUtil");
-
 // load .env config
 dotenv.config();
+const { transporter } = require("./services/email/emailUtil");
+
 const app = express();
 app.use(
   cors({
@@ -27,9 +27,10 @@ app.use(errorHandler);
 const PORT = process.env.PORT ? process.env.PORT : 3000;
 
 async function connectToDB() {
-  await mongoose.connect(
-    `mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_HOST}:27017/bookingDB?authSource=admin`
-  );
+  // await mongoose.connect(
+  //   `mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_HOST}:27017/bookingDB?authSource=admin`
+  // );
+  await mongoose.connect(process.env.MONGO_URL);
 }
 
 async function main() {

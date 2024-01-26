@@ -137,17 +137,14 @@ async function getOTP(req, res, next) {
 async function verifyOTP(req, res, next) {
   try {
     const { otp, transactionId } = req.body;
-    console.log(otp, transactionId);
     const otpData = await findByTransaction(transactionId);
     if (!otpData) {
       res.status(400);
       throw new Error("Incorrect OTP");
     }
     if (otpData.otp === otp) {
-      console.log(otpData);
       let data;
       const existingUser = await findUserByEmail(otpData.email);
-      console.log(existingUser);
       if (existingUser) {
         const accessToken = generateAccessToken(existingUser);
         data = { accessToken };
@@ -157,7 +154,6 @@ async function verifyOTP(req, res, next) {
           roles: ["GUEST"],
         };
         const user = await saveUser(userData);
-        console.log(user);
         const accessToken = generateAccessToken(user);
         data = { accessToken };
       }
