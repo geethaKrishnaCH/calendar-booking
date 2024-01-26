@@ -2,7 +2,10 @@
 
 ### Clone the project
 
-<code>git clone https://github.com/geethaKrishnaCH/calendar-booking.git</code>
+```
+git clone https://github.com/geethaKrishnaCH/calendar-booking.git
+git checkout dev
+```
 
 ### Backend
 
