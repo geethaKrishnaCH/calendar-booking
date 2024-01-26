@@ -5,6 +5,7 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import { GoArrowRight } from "react-icons/go";
+import { useNavigate } from "react-router-dom";
 import useBookingsApi from "../../../../apis/useBookingsApi";
 import {
   convertDateStringTimeStringToDate,
@@ -20,7 +21,8 @@ function AddBooking() {
   const [validated, setValidated] = useState(false);
   const [showReccurenceEndDate, setShowReccurenceEndDate] = useState(false);
   const [showDaysToChoose, setShowDaysToChoose] = useState(false);
-  const [bookingData, setBookingData] = useState({
+  const navigate = useNavigate();
+  const INITIAL_BOOKING_STATE = {
     title: "",
     repeatFrequency: "",
     description: "",
@@ -37,13 +39,15 @@ function AddBooking() {
       onlineMode: false,
       address: "",
     },
-  });
-  const [eventTimings, setEventTimings] = useState({
+  };
+  const INITIAL_EVENT_TIMINGS = {
     startDate: "",
     startTime: "",
     endDate: "",
     endTime: "",
-  });
+  };
+  const [bookingData, setBookingData] = useState(INITIAL_BOOKING_STATE);
+  const [eventTimings, setEventTimings] = useState(INITIAL_EVENT_TIMINGS);
   const DAYS_IN_A_WEEK = [
     { value: "SUN", selected: false },
     { value: "MON", selected: false },
@@ -125,6 +129,9 @@ function AddBooking() {
     selectedDay.selected = !selectedDay.selected;
     setSelectedDays([...tempSelectedDays]);
   };
+  const navigateToMyBookings = () => {
+    navigate("/admin/bookings");
+  };
   const handleSubmit = async (event) => {
     event.stopPropagation();
     event.preventDefault();
@@ -150,16 +157,20 @@ function AddBooking() {
         showLoader();
         await addBooking(bookingData);
         handleShowToast("Booking created.");
+        navigateToMyBookings();
       } catch (err) {
         handleAPIError(err);
       } finally {
         hideLoader();
       }
-      // return;
     }
     setValidated(true);
   };
-
+  const resetForm = () => {
+    setBookingData(INITIAL_BOOKING_STATE);
+    setEventTimings(INITIAL_EVENT_TIMINGS);
+    // setValidated(true);
+  };
   const cleanBookingData = () => {
     bookingData.maxParticipants = parseInt(bookingData.maxParticipants);
     bookingData.subSlotInfo.duration = parseInt(
@@ -172,13 +183,15 @@ function AddBooking() {
   const handleFormChange = (e) => {
     if (e.target.name === "onlineMode") {
       const onlineMode = e.target.checked;
+      const location = { ...bookingData.location };
+      location.onlineMode = onlineMode;
       if (onlineMode) {
-        // remove address
+        location.address = "";
       } else {
-        // remove meetingLink
+        location.meetingLink = "";
       }
       setBookingData((prev) => {
-        return { ...prev, location: { ...prev.location, onlineMode } };
+        return { ...prev, location: { ...location } };
       });
       return;
     }

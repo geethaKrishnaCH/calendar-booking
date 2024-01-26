@@ -4,6 +4,7 @@ import { FaUserLock } from "react-icons/fa";
 import { MdEventAvailable } from "react-icons/md";
 import { FaCalendarPlus } from "react-icons/fa";
 import { FaPowerOff } from "react-icons/fa";
+import { BiCategory } from "react-icons/bi";
 import { Link } from "react-router-dom";
 import AppContext from "../../context/AppContext";
 import UserAvatar from "../user-avatar/UserAvatar";
@@ -42,16 +43,22 @@ export default function Navbar() {
 
                 {user?.roles?.includes("ADMIN") && (
                   <>
-                    <Nav.Link as={Link} to={"/bookings"}>
+                    <Nav.Link as={Link} to={"/admin/bookings"}>
                       <div className="d-flex align-items-center">
                         <MdEventAvailable size={24} className="me-2" />
                         <p className="m-0">My Bookings</p>
                       </div>
                     </Nav.Link>
-                    <Nav.Link as={Link} to={"/bookings/add"}>
+                    <Nav.Link as={Link} to={"/admin/bookings/add"}>
                       <div className="d-flex align-items-center">
                         <FaCalendarPlus size={18} className="me-2" />
                         <p className="m-0">Add</p>
+                      </div>
+                    </Nav.Link>
+                    <Nav.Link as={Link} to={"/admin/category"}>
+                      <div className="d-flex align-items-center">
+                        <BiCategory size={18} className="me-2" />
+                        <p className="m-0">Category</p>
                       </div>
                     </Nav.Link>
                   </>

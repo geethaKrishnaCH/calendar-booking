@@ -8,7 +8,12 @@ const ProtectedRoute = ({ children }) => {
   const ALLOWED_ROUTES = {
     GUEST: ["/home", "/user/bookings"],
     USER: ["/home", "/user/bookings"],
-    ADMIN: ["/home", "/bookings", "/bookings/add"],
+    ADMIN: [
+      "/home",
+      "/admin/bookings",
+      "/admin/bookings/add",
+      "/admin/category",
+    ],
   };
 
   if (isLoggedIn) {

@@ -8,6 +8,7 @@ const AppContext = createContext({
   user: null,
   isLoading: null,
   categories: [],
+  setCategories: () => {},
   hideLoader: () => {},
   showLoader: () => {},
   handleAPIError: () => {},
@@ -44,12 +45,12 @@ export const AppContextProvider = ({ children }) => {
     if (err?.response.status === 401) {
       handleLogout();
       handleShowToast("Session has timed out!", true);
-    }
-    if (err?.response.status === 403) {
+    } else if (err?.response.status === 403) {
       handleShowToast("Access denied!", true);
-    }
-    if (err?.response.status === 400) {
+    } else if (err?.response.status === 400) {
       handleShowToast(err.response?.data?.message, true);
+    } else {
+      handleShowToast("Unknown Error", true);
     }
   };
 
@@ -136,6 +137,7 @@ export const AppContextProvider = ({ children }) => {
         setLogInState,
         user,
         categories,
+        setCategories,
         hideLoader,
         showLoader,
         isLoading,

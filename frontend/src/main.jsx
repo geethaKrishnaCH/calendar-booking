@@ -13,6 +13,7 @@ import Login from "./components/pages/login/Login";
 import SignUp from "./components/pages/signup/SignUp";
 import "./index.css";
 import UserBookings from "./components/pages/bookings/user-bookings/UserBookings";
+import Category from "./components/pages/category/Category";
 
 const router = createBrowserRouter([
   {
@@ -37,7 +38,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "bookings",
+        path: "admin/bookings",
         element: (
           <ProtectedRoute>
             <MyBookings />
@@ -53,10 +54,18 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "bookings/add",
+        path: "admin/bookings/add",
         element: (
           <ProtectedRoute>
             <AddBooking />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "admin/category",
+        element: (
+          <ProtectedRoute>
+            <Category />
           </ProtectedRoute>
         ),
       },
